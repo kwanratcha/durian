@@ -1,0 +1,123 @@
+<html>
+<head>
+<title>main.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #0033b3;}
+.s1 { color: #080808;}
+.s2 { color: #1750eb;}
+.s3 { color: #067d17;}
+.s4 { color: #8c8c8c; font-style: italic;}
+.s5 { color: #0037a6;}
+</style>
+</head>
+<body bgcolor="#ffffff">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#c0c0c0" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+main.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">ultralytics</span>
+<span class="s0">from </span><span class="s1">ultralytics </span><span class="s0">import </span><span class="s1">YOLO</span>
+<span class="s0">import </span><span class="s1">pandas </span><span class="s0">as </span><span class="s1">pd</span>
+<span class="s0">import </span><span class="s1">matplotlib.pyplot </span><span class="s0">as </span><span class="s1">plt</span>
+<span class="s0">from </span><span class="s1">PIL </span><span class="s0">import </span><span class="s1">Image</span>
+<span class="s0">import </span><span class="s1">numpy </span><span class="s0">as </span><span class="s1">np</span>
+<span class="s0">import </span><span class="s1">matplotlib.font_manager </span><span class="s0">as </span><span class="s1">fm</span>
+
+<span class="s0">def </span><span class="s1">Check_Probability_Threshold(threshold):</span>
+    <span class="s0">for </span><span class="s1">probability </span><span class="s0">in </span><span class="s1">probs:</span>
+        <span class="s0">if </span><span class="s1">probability &gt; (threshold/</span><span class="s2">100</span><span class="s1">):</span>
+            <span class="s0">return True</span>
+    <span class="s0">return False</span>
+
+
+
+<span class="s0">if </span><span class="s1">__name__ == </span><span class="s3">'__main__'</span><span class="s1">:</span>
+    <span class="s1">ultralytics.checks()</span>
+    <span class="s1">Path = </span><span class="s3">'D:/final_project/use_to_train/train_aug'</span>
+    <span class="s4">#train model</span>
+    <span class="s1">model = YOLO(</span><span class="s3">'yolov8n-cls.pt'</span><span class="s1">)  </span><span class="s4"># load a pretrained model (recommended for training)</span>
+    <span class="s4">#print (model)</span>
+    <span class="s4">#results = model.train(</span>
+    <span class="s4">#     data=Path,</span>
+    <span class="s4">#     epochs=30,</span>
+    <span class="s4">#     imgsz=640,</span>
+    <span class="s4">#     lr0=0.00001,</span>
+    <span class="s4">#     dropout=0.1,</span>
+    <span class="s4">#     cls=0.5)</span>
+
+    <span class="s4">#plot loss</span>
+    <span class="s1">results_path = </span><span class="s3">'D:/final_project/final report/code_1/runs/classify/train6/results.csv'</span>
+    <span class="s1">results = pd.read_csv(results_path)</span>
+    <span class="s1">plt.figure()</span>
+    <span class="s1">plt.plot(results[</span><span class="s3">'                  epoch'</span><span class="s1">], results[</span><span class="s3">'             train/loss'</span><span class="s1">], label=</span><span class="s3">'train loss'</span><span class="s1">)</span>
+    <span class="s1">plt.plot(results[</span><span class="s3">'                  epoch'</span><span class="s1">], results[</span><span class="s3">'               val/loss'</span><span class="s1">], label=</span><span class="s3">'val loss'</span><span class="s1">, c=</span><span class="s3">'red'</span><span class="s1">)</span>
+    <span class="s1">plt.grid()</span>
+    <span class="s1">plt.title(</span><span class="s3">'Loss vs epochs'</span><span class="s1">)</span>
+    <span class="s1">plt.ylabel(</span><span class="s3">'loss'</span><span class="s1">)</span>
+    <span class="s1">plt.xlabel(</span><span class="s3">'epochs'</span><span class="s1">)</span>
+    <span class="s1">plt.legend()</span>
+    <span class="s1">plt.show()</span>
+    <span class="s4">#%matplotlib inline</span>
+    <span class="s1">plt.figure()</span>
+    <span class="s1">plt.plot(results[</span><span class="s3">'                  epoch'</span><span class="s1">], results[</span><span class="s3">'  metrics/accuracy_top1'</span><span class="s1">] * </span><span class="s2">100</span><span class="s1">)</span>
+    <span class="s1">plt.grid()</span>
+    <span class="s1">plt.title(</span><span class="s3">'Validation accuracy vs epochs'</span><span class="s1">)</span>
+    <span class="s1">plt.ylabel(</span><span class="s3">'accuracy (%)'</span><span class="s1">)</span>
+    <span class="s1">plt.xlabel(</span><span class="s3">'epochs'</span><span class="s1">)</span>
+    <span class="s1">plt.show()</span>
+
+    <span class="s1">model = YOLO(</span><span class="s3">'D:/final_project/final report/code_1/runs/classify/train6/weights/last.pt'</span><span class="s1">)  </span><span class="s4"># load a custom model</span>
+    <span class="s4">#ให้โมเดลทำนาย</span>
+    <span class="s1">Image_Predict = </span><span class="s3">'D:/final_project/final report/test/แดงอินโด.jpg'</span>
+    <span class="s1">results = model(Image_Predict)  </span><span class="s4"># predict on an image</span>
+    <span class="s1">names_dict = results[</span><span class="s2">0</span><span class="s1">].names</span>
+    <span class="s1">probs = results[</span><span class="s2">0</span><span class="s1">].probs.data.tolist()</span>
+    <span class="s1">print(names_dict)</span>
+    <span class="s1">print(probs)</span>
+    <span class="s1">print()</span>
+    <span class="s1">print()</span>
+    <span class="s1">print()</span>
+    <span class="s1">print()</span>
+    <span class="s1">print()</span>
+    <span class="s1">print(</span><span class="s3">&quot;Predict Result:&quot;</span><span class="s1">, names_dict[np.argmax(probs)])</span>
+    <span class="s1">lable = {</span>
+        <span class="s3">&quot;chani&quot;</span><span class="s1">:</span><span class="s3">&quot;ชะนี&quot;</span><span class="s1">,</span>
+        <span class="s3">&quot;kanyao&quot;</span><span class="s1">:</span><span class="s3">&quot;ก้านยาว&quot;</span><span class="s1">,</span>
+        <span class="s3">&quot;longL&quot;</span><span class="s1">:</span><span class="s3">&quot;หลงลับแล&quot;</span><span class="s1">,</span>
+        <span class="s3">&quot;med&quot;</span><span class="s1">:</span><span class="s3">&quot;เม็ดในยายปราง&quot;</span><span class="s1">,</span>
+        <span class="s3">&quot;moanthong&quot;</span><span class="s1">:</span><span class="s3">&quot;หมอนทอง&quot;</span><span class="s1">,</span>
+        <span class="s3">&quot;nokyib&quot;</span><span class="s1">:</span><span class="s3">&quot;นกหยิบ&quot;</span><span class="s1">,</span>
+        <span class="s3">&quot;salika&quot;</span><span class="s1">:</span><span class="s3">&quot;สาลิกา&quot;</span><span class="s1">,</span>
+        <span class="s3">&quot;thongY&quot;</span><span class="s1">:</span><span class="s3">&quot;ทองย้อยฉัตร&quot;</span>
+    <span class="s1">}</span>
+
+    <span class="s1">font = </span><span class="s3">'D:/final_project/final report/code_1/TumthaiThin.ttf'</span>
+    <span class="s1">thai_font = fm.FontProperties(fname=font)</span>
+    <span class="s1">names_dict = results[</span><span class="s2">0</span><span class="s1">].names</span>
+    <span class="s1">probs = results[</span><span class="s2">0</span><span class="s1">].probs.data.tolist()</span>
+    <span class="s1">predicted_index = np.argmax(probs)  </span><span class="s4"># หาดัชนีของความน่าจะเป็นสูงสุด</span>
+    <span class="s1">predicted_class = names_dict[predicted_index]  </span><span class="s4"># ชื่อคลาสที่สอดคล้อง</span>
+    <span class="s1">predicted_prob = probs[predicted_index]  </span><span class="s4"># ความน่าจะเป็นสูงสุด</span>
+    <span class="s0">if </span><span class="s1">predicted_prob &gt;= </span><span class="s2">0.60</span><span class="s1">:</span>
+        <span class="s4">#print(f&quot;Predicted Class: {predicted_class}, Probability: {predicted_prob}&quot;)</span>
+        <span class="s1">x, y = </span><span class="s2">10</span><span class="s1">, </span><span class="s2">20</span>
+        <span class="s1">img = Image.open(Image_Predict)  </span><span class="s4"># ใช้ภาพต้นฉบับในการแสดง</span>
+        <span class="s1">fig, ax = plt.subplots()</span>
+        <span class="s1">ax.imshow(img)</span>
+        <span class="s1">ax.annotate(</span><span class="s3">f&quot;</span><span class="s5">{</span><span class="s1">lable[predicted_class]</span><span class="s5">}</span><span class="s3">: </span><span class="s5">{</span><span class="s1">predicted_prob</span><span class="s5">:</span><span class="s3">.2f</span><span class="s5">}</span><span class="s3">&quot;</span><span class="s1">, (</span><span class="s2">10</span><span class="s1">, </span><span class="s2">20</span><span class="s1">), color=</span><span class="s3">'white'</span><span class="s1">, weight=</span><span class="s3">'bold'</span><span class="s1">,</span>
+                    <span class="s1">fontsize=</span><span class="s2">18</span><span class="s1">,</span>
+                    <span class="s1">ha=</span><span class="s3">'left'</span><span class="s1">, va=</span><span class="s3">'top'</span><span class="s1">, fontproperties=thai_font)</span>
+        <span class="s1">plt.show()</span>
+    <span class="s0">else</span><span class="s1">:</span>
+        <span class="s1">x, y = </span><span class="s2">10</span><span class="s1">, </span><span class="s2">20</span>
+        <span class="s1">img = Image.open(Image_Predict)  </span><span class="s4"># ใช้ภาพต้นฉบับในการแสดง</span>
+        <span class="s1">fig, ax = plt.subplots()</span>
+        <span class="s1">ax.imshow(img)</span>
+        <span class="s1">ax.annotate(</span><span class="s3">f&quot;Unknown&quot;</span><span class="s1">, (x, y), color=</span><span class="s3">'red'</span><span class="s1">, weight=</span><span class="s3">'bold'</span><span class="s1">, fontsize=</span><span class="s2">18</span><span class="s1">,</span>
+                    <span class="s1">ha=</span><span class="s3">'left'</span><span class="s1">, va=</span><span class="s3">'top'</span><span class="s1">)</span>
+        <span class="s1">plt.show()</span>
+</pre>
+</body>
+</html>
